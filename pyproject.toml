@@ -1,0 +1,43 @@
+[project]
+name = "aletheia-orchestrator"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Masoud Kaderpur",email = "kaderpurm06@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph (>=1.0.7,<2.0.0)",
+    "pydantic-settings (>=2.12.0,<3.0.0)",
+    "tavily-python (>=0.7.21,<0.8.0)",
+    "langchain-openai (>=1.1.7,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "aletheia_orchestrator", from = "src"}]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.15.0,<0.16.0)",
+    "pre-commit (>=4.5.1,<5.0.0)"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C4", "UP", "N"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
