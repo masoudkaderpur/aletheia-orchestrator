@@ -17,4 +17,4 @@ COPY src/ /app/src/
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-CMD ["python", "src/main.py"]
+CMD ["python", "src/aletheia_orchestrator/main.py"]

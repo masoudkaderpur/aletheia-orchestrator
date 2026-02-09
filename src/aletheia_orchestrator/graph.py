@@ -1,7 +1,17 @@
 from langgraph.graph import END, StateGraph
 
+from aletheia_orchestrator.nodes.critic import criticize
 from aletheia_orchestrator.nodes.generator import call_model
 from aletheia_orchestrator.state import AgentState
+
+
+def router(state: AgentState):
+    """
+    Determines the next step in the workflow.
+    """
+    if state["is_factually_correct"]:
+        return "exit"
+    return "retry"
 
 
 def create_orchestrator():
@@ -19,14 +29,16 @@ def create_orchestrator():
     # 2. Register Nodes
     # We map logical names to the actual Python functions (the "Workers").
     builder.add_node("generator", call_model)
+    builder.add_node("critic", criticize)
 
     # 3. Define the Orchestration Flow (Edges)
     builder.set_entry_point("generator")
 
     # Current simplistic flow: Generator -> Exit
     # Tomorrow, this will evolve into: Generator -> Critic -> Router
-    builder.add_edge("generator", END)
+    builder.add_edge("generator", "critic")
 
+    builder.add_conditional_edges("critic", router, {"exit": END, "retry": "generator"})
     # 4. Compile the Workflow
     # This transforms the definition into an executable 'CompiledGraph' object.
     return builder.compile()
