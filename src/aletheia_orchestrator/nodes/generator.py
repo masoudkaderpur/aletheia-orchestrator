@@ -1,10 +1,20 @@
+import os
+
+from dotenv import load_dotenv
 from langchain_core.messages import AIMessage
 from langchain_openai import ChatOpenAI
 
 from aletheia_orchestrator.state import AgentState
 
+load_dotenv()
+
 # Initialize the model with zero temperature for deterministic, factual outputs
-model = ChatOpenAI(model="gpt-4o", temperature=0)
+model = ChatOpenAI(
+    model="gpt-4o",
+    temperature=0,
+    openai_api_key=os.getenv("GITHUB_TOKEN"),
+    base_url="https://models.inference.ai.azure.com",
+)
 
 
 def call_model(state: AgentState):
