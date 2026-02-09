@@ -11,7 +11,8 @@ dependencies = [
     "langgraph (>=1.0.7,<2.0.0)",
     "pydantic-settings (>=2.12.0,<3.0.0)",
     "tavily-python (>=0.7.21,<0.8.0)",
-    "langchain-openai (>=1.1.7,<2.0.0)"
+    "langchain-openai (>=1.1.7,<2.0.0)",
+    "langchain-core (>=1.2.9,<2.0.0)"
 ]
 
 [tool.poetry]
