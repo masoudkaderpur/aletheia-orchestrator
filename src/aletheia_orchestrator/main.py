@@ -34,7 +34,7 @@ def run_orchestrator():
         final_response = result["messages"][-1].content
         print("\n--- Final Output ---")
         print(final_response)
-        print(f"\n[Metadaten]: Iterations performed: {result['iterations']}")
+        print(f"\n[Metadata]: Iterations performed: {result['iterations']}")
 
     except Exception as e:
         print(f"An error occurred during graph execution: {e}")
