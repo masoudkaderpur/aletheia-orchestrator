@@ -3,27 +3,44 @@ from typing import Annotated, TypedDict
 
 from langchain_core.messages import BaseMessage
 
+"""
+PURPOSE: The 'Shared Memory' of the system.
+In LangGraph, nodes remain functionally isolated; they communicate exclusively by
+writing to and reading from this State object. This architecture ensures the
+Generator and Critic are stateless, while the Graph manages persistence.
+"""
+
 
 def merge_messages(
     left: list[BaseMessage], right: list[BaseMessage]
 ) -> list[BaseMessage]:
     """
-    Reducer function to append new messages to the existing state history.
-    Ensures the conversation context is preserved for iterative refinement.
+    REDUCER LOGIC:
+    LangGraph utilizes reducer functions to determine how state updates are applied.
+    Instead of overwriting history, this appends new messages to the list.
+    This preservation of context is critical for the Critic to analyze
+    previous Generator outputs.
     """
     return left + right
 
 
 class AgentState(TypedDict):
     """
-    Maintains the orchestration state for the Aletheia-Orchestrator.
+    STATE SCHEMA:
+    The formal definition of the system's configuration space.
+    Every attribute acts as a signal for the Router's transition logic.
 
     Attributes:
-        messages: Accumulated history of generator outputs and critic feedback.
-        is_factually_correct: Convergence signal used to exit the refinement loop.
-        iterations: Guardrail counter to prevent infinite recursion during k-refinement.
+        messages: The conversation thread containing all AI and Human interactions.
+        is_factually_correct: The primary exit signal (Boolean Gate).
+        iterations: A safety counter to enforce termination at n_max.
     """
 
+    # Annotated[..., add] enables additive updates rather than overwrites.
     messages: Annotated[list[BaseMessage], add]
+
     is_factually_correct: bool
+
+    # Utilizing 'add' here allows nodes to return {"iterations": 1}
+    # for automatic global incrementing.
     iterations: Annotated[int, add]

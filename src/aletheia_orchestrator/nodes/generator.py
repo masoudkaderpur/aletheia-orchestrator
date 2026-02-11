@@ -6,9 +6,18 @@ from langchain_openai import ChatOpenAI
 
 from aletheia_orchestrator.state import AgentState
 
+"""
+PURPOSE: The 'Synthesis Node' (G).
+This component is responsible for processing the current state history
+and generating the most accurate technical response possible.
+"""
+
 load_dotenv()
 
-# Initialize the model with zero temperature for deterministic, factual outputs
+# MODEL CONFIGURATION:
+# Temperature is set to 0 to minimize 'stochastic variance'.
+# This ensures that for the same set of inputs, the model provides the
+# most probable and factual completion rather than creative alternatives.
 model = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
@@ -19,10 +28,19 @@ model = ChatOpenAI(
 
 def call_model(state: AgentState):
     """
-    Passes the current state messages to the LLM and records the response.
+    GENERATION LOGIC:
+    Acts as the primary worker node. It consumes the 'messages' history
+    from the state and generates a refined response based on the
+    original query and any subsequent Critic feedback.
     """
-    # Invoke the model with the full message history from the state
+
+    # Context Awareness:
+    # By passing state["messages"], the model sees the entire conversation
+    # thread, allowing it to 'learn' from previous Critic rejections.
     response = model.invoke(state["messages"])
 
-    # Return the new AI message and increment the iteration counter
+    # STATE UPDATE:
+    # 1. messages: The response is wrapped in an AIMessage and appended to history.
+    # 2. iterations: Returning 1 triggers the 'add' reducer in state.py,
+    #    automatically incrementing the global counter.
     return {"messages": [AIMessage(content=response.content)], "iterations": 1}
