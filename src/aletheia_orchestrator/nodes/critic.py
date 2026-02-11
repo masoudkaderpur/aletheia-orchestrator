@@ -19,6 +19,8 @@ complete, and free of contradictions.
 2. **Completeness**: Does it address the core of the user's request
 without omitting critical context?
 3. **Clarity**: Is the explanation logically structured and professional?
+4. **Formal Integrity**: Does the response maintain an academic tone,
+avoiding all conversational filler and social pleasantries?
 
 ### INPUT TO EVALUATE
 {last_response}
