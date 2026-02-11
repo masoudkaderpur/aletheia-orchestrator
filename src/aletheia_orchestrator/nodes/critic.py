@@ -46,22 +46,27 @@ def criticize(state: AgentState):
     formatted_prompt = CRITIC_PROMPT.format(last_response=last_response)
 
     # 2. Inference:
-    # Invokes the model (reusing the gpt-4o instance from generator.py)
-    # to perform the zero-shot audit.
+    # Invokes the model (reusing the gpt-4o instance) to perform the audit.
     raw_judge_response = model.invoke(formatted_prompt).content
 
-    # 3. Signal Extraction:
-    # Parses the string response to set the 'is_factually_correct' boolean.
-    # The startswith("YES") check creates a binary switch for the router.
+    # 3. Qualitative Feedback Extraction:
+    # Splits the response at the pipe operator. This ensures the Generator
+    # receives only the actionable instructions, stripped of the YES/NO prefix.
+    parts = raw_judge_response.split("|", 1)
+    feedback = parts[1].strip() if len(parts) > 1 else raw_judge_response
+
+    # 4. Signal Extraction:
+    # Sets the boolean gate. startswith("YES") creates the binary switch
+    # required by the conditional edge in graph.py.
     is_correct = raw_judge_response.strip().upper().startswith("YES")
 
-    # 4. Observability:
-    # Outputs the audit result to the console for real-time monitoring.
+    # 5. Observability:
+    # Real-time console output for monitoring the internal reasoning loop.
     status = "PASSED" if is_correct else "FAILED"
     print(f"\n[CRITIC] Analysis: {status}")
     print(f"[CRITIC] Feedback: {raw_judge_response}")
 
     # STATE UPDATE:
-    # Returns only the boolean signal. Note that currently,
-    # the textual feedback is printed but not stored back in 'messages'.
-    return {"is_factually_correct": is_correct}
+    # Injects both the binary signal (for routing) and the qualitative feedback
+    # (for the next generation cycle) back into the state.
+    return {"is_factually_correct": is_correct, "critic_feedback": feedback}

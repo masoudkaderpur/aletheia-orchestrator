@@ -44,3 +44,5 @@ class AgentState(TypedDict):
     # Utilizing 'add' here allows nodes to return {"iterations": 1}
     # for automatic global incrementing.
     iterations: Annotated[int, add]
+
+    critic_feedback: str
