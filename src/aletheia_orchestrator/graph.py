@@ -18,10 +18,26 @@ def router(state: AgentState):
     convergence signal (is_factually_correct) to decide whether to
     terminate the process or trigger a refinement cycle.
     """
-    if state["is_factually_correct"]:
+
+    # ITERATION GUARDRAIL (Safety Termination):
+    # Implements a hard stop after n-attempts to mitigate unbounded
+    # execution costs and potential oscillating feedback loops.
+    # This acts as the 'Maximum Entropy' exit strategy.
+    if state["iterations"] >= 3:
+        print("\n[ROUTER] Info: Maximum iterations reached. Terminating safety loop.")
         return "exit"
 
-    # If not correct, the flow returns to the generator node.
+    # CONVERGENCE SIGNAL:
+    # Evaluates the boolean satisfaction flag from the Critic node.
+    # Logic follows the 'Aletheia' principle: termination only upon
+    # verification of factual integrity.
+    if state["is_factually_correct"]:
+        print("\n[ROUTER] Info: Truth condition met (Aletheia).")
+        return "exit"
+
+    # RECURSIVE REFINEMENT:
+    # Default state for non-convergent paths. Re-triggers the Generator
+    # to perform a delta-update based on the accumulated context.
     return "retry"
 
 
